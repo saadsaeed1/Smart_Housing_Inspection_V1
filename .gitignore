@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/
+
+# Secrets
+.env
+.env.*
+secrets.toml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+
+# Runtime / temporary tunnel files
+*.pid
+
+# Local development artifacts
+.pytest_cache/
+.coverage
+
+# Local inspection data
+data/*.csv
+
+# Inspection photographs
+assets/site_images/*
