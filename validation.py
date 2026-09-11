@@ -5,6 +5,9 @@ from config import (
     INSPECTION_TYPES,
     CONSTRUCTION_ACTIVITIES,
     LEVELS,
+    LEVEL_HIERARCHY,
+    STRUCTURAL_ACTIVITIES,
+    FINISHING_ACTIVITIES,
     COMPLIANCE_STATUSES,
     SEVERITY_LEVELS,
     VIOLATION_TYPES,
@@ -37,7 +40,7 @@ def validate_inspection(record):
     errors = []
 
     # --------------------------------------------------------
-    # 1. Base Schema Requirements
+    # 1. Base Schema Mandatory Fields
     # --------------------------------------------------------
     for field, rules in INSPECTION_SCHEMA.items():
         if field == "Inspection ID":
@@ -50,7 +53,7 @@ def validate_inspection(record):
             errors.append(f"{field} is required.")
 
     # --------------------------------------------------------
-    # 2. Controlled Values
+    # 2. Controlled Values Check
     # --------------------------------------------------------
     for field, allowed_values in CONTROLLED_VALUES.items():
         value = record.get(field)
@@ -63,6 +66,7 @@ def validate_inspection(record):
     # 3. Progress % Validation
     # --------------------------------------------------------
     progress = record.get("Progress %")
+    progress_value = None
     if not is_empty(progress):
         try:
             progress_value = float(progress)
@@ -112,7 +116,7 @@ def validate_inspection(record):
             errors.append("Recommended Action is required when Work Stopped is Yes.")
 
     # --------------------------------------------------------
-    # 6. Follow-up & Deadline Date Rules
+    # 6. Dates & Chronology
     # --------------------------------------------------------
     follow_up_required = record.get("Follow-up Required")
     follow_up_date = record.get("Follow-up Date")
@@ -140,32 +144,89 @@ def validate_inspection(record):
             pass
 
     # --------------------------------------------------------
-    # 7. Dual Photographic Evidence Logic
+    # 7. Dual Photographic Evidence Logic (Option B)
     # --------------------------------------------------------
     front_image = record.get("Front-view Site Image")
     defect_image = record.get("Defect Evidence Image")
     plot_number = str(record.get("Plot Number", "")).strip().upper()
 
-    # Query existing database to check if this is the plot's baseline visit
     df_existing = load_inspections()
+    plot_history = pd.DataFrame()
     is_baseline = True
+
     if not df_existing.empty and "Plot Number" in df_existing.columns:
-        existing_plots = (
-            df_existing["Plot Number"].astype(str).str.strip().str.upper().tolist()
-        )
-        if plot_number in existing_plots:
+        plot_history = df_existing[
+            df_existing["Plot Number"].astype(str).str.strip().str.upper() == plot_number
+        ].copy()
+        if not plot_history.empty:
             is_baseline = False
 
-    # Rule A: Front-view photo mandatory on first visit
     if is_baseline and is_empty(front_image):
         errors.append("Front-view Site Image is required for the baseline (first) inspection of a plot.")
 
-    # Rule B: Defect evidence photo mandatory on violations
     if compliance_status in ["Minor Non-Compliance", "Major Non-Compliance"] and is_empty(defect_image):
         errors.append("Defect Evidence Image is mandatory when logging Minor or Major Non-Compliance.")
 
-    # Rule C: Both macro and micro evidence required when halting work
     if work_stopped is True and is_empty(front_image):
         errors.append("Front-view Site Image is mandatory to document overall site condition when issuing a Stop Work order.")
 
+    # --------------------------------------------------------
+    # 8. Vertical Hierarchy & Construction Sequence Rules
+    # --------------------------------------------------------
+    activity = record.get("Construction Activity")
+    level = record.get("Level / Floor")
+    current_level_rank = LEVEL_HIERARCHY.get(level)
+
+    if not plot_history.empty:
+        # A. Find highest structural level previously executed on this plot
+        structural_history = plot_history[
+            plot_history["Construction Activity"].isin(STRUCTURAL_ACTIVITIES)
+        ]
+
+        highest_structural_rank = -1
+        highest_structural_level_name = ""
+
+        for _, past_row in structural_history.iterrows():
+            past_level = past_row.get("Level / Floor")
+            if past_level in LEVEL_HIERARCHY:
+                past_rank = LEVEL_HIERARCHY[past_level]
+                if past_rank > highest_structural_rank:
+                    highest_structural_rank = past_rank
+                    highest_structural_level_name = past_level
+
+        # Rule 8.1: Structural Monotonic Ascent
+        # Primary framing casting cannot move backwards down the structure
+        superstructure_casting = ["Columns / Beams Casting", "Slab Casting"]
+        if activity in superstructure_casting and current_level_rank is not None:
+            if highest_structural_rank != -1 and current_level_rank < highest_structural_rank:
+                errors.append(
+                    f"Structural sequence violation: Cannot log '{activity}' on '{level}' "
+                    f"(Rank {current_level_rank}) when '{highest_structural_level_name}' "
+                    f"(Rank {highest_structural_rank}) has already been structurally reached."
+                )
+
+        # Rule 8.2: Finishing Trades Pre-requisite
+        # Finishing trades cannot occur on a floor that has not been structurally cast yet
+        if activity in FINISHING_ACTIVITIES and current_level_rank is not None:
+            if highest_structural_rank != -1 and current_level_rank > highest_structural_rank:
+                errors.append(
+                    f"Construction sequence violation: Cannot log finishing trade '{activity}' on '{level}' "
+                    f"before structural casting for that level has been logged (Current highest structural level: "
+                    f"'{highest_structural_level_name}')."
+                )
+
+        # Rule 8.3: Physical Progress Non-Regression
+        if progress_value is not None and "Progress %" in plot_history.columns:
+            past_progresses = pd.to_numeric(plot_history["Progress %"], errors="coerce").dropna()
+            if not past_progresses.empty:
+                max_past_progress = past_progresses.max()
+                if progress_value < max_past_progress:
+                    errors.append(
+                        f"Progress regression: Physical progress cannot drop from {max_past_progress:.1f}% "
+                        f"to {progress_value:.1f}% without formal demolition/rework justification."
+                    )
+
     return errors
+
+
+print("🟢 validation.py loaded successfully.")
