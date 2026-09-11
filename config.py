@@ -1,12 +1,21 @@
 # ============================================================
 # Smart Housing Inspection Dashboard V1
-# Configuration
+# Controlled Vocabulary & Site Configuration
 # ============================================================
 
-# ------------------------------------------------------------
-# Inspection Types
-# ------------------------------------------------------------
+# Society Sectors
+SECTORS = [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "Overseas",
+    "Commercial",
+]
 
+# Inspection Types
 INSPECTION_TYPES = [
     "Routine Inspection",
     "Follow-up Inspection",
@@ -16,51 +25,55 @@ INSPECTION_TYPES = [
     "Other",
 ]
 
-# ------------------------------------------------------------
-# Construction Activities
-# ------------------------------------------------------------
-
-CONSTRUCTION_ACTIVITIES = [
-    "Pre-Construction",
-    "Excavation",
-    "Foundation",
-    "Steel Fixing",
-    "Concrete Casting",
-    "Brickwork",
-    "Plastering",
-    "Roofing",
-    "Finishing",
-    "Completion",
-    "Other",
-]
-
-# ------------------------------------------------------------
-# Levels / Floors
-# ------------------------------------------------------------
-
+# Vertical Levels & Monotonic Structural Hierarchy
 LEVELS = [
+    "Foundation / Sub-structure",
     "Basement",
     "Ground Floor",
     "First Floor",
     "Second Floor",
-    "Third Floor",
-    "Fourth Floor",
-    "Other / Not Applicable",
+    "Rooftop / Parapet",
 ]
 
-# ------------------------------------------------------------
-# Compliance Statuses
-# ------------------------------------------------------------
+LEVEL_HIERARCHY = {
+    "Foundation / Sub-structure": 0,
+    "Basement": 1,
+    "Ground Floor": 2,
+    "First Floor": 3,
+    "Second Floor": 4,
+    "Rooftop / Parapet": 5,
+}
 
+# Trade Sequence Classifications
+STRUCTURAL_ACTIVITIES = [
+    "Excavation",
+    "Foundation",
+    "Rebar & Formwork Checking",
+    "Columns / Beams Casting",
+    "Slab Casting",
+]
+
+FINISHING_ACTIVITIES = [
+    "Brickwork / Masonry",
+    "Plastering",
+    "MEP Rough-ins",
+    "Flooring",
+    "Painting",
+    "Finishing",
+]
+
+CONSTRUCTION_ACTIVITIES = (
+    STRUCTURAL_ACTIVITIES
+    + FINISHING_ACTIVITIES
+    + ["Boundary Wall", "Site Clearance", "Other"]
+)
+
+# Compliance & Enforcement Lists
 COMPLIANCE_STATUSES = [
     "Compliant",
     "Minor Non-Compliance",
     "Major Non-Compliance",
 ]
-
-# ------------------------------------------------------------
-# Severity Levels
-# ------------------------------------------------------------
 
 SEVERITY_LEVELS = [
     "Low",
@@ -68,10 +81,6 @@ SEVERITY_LEVELS = [
     "High",
     "Critical",
 ]
-
-# ------------------------------------------------------------
-# Violation Types
-# ------------------------------------------------------------
 
 VIOLATION_TYPES = [
     "No Violation",

@@ -1,7 +1,7 @@
-
 import streamlit as st
 from data_manager import load_inspections
 from pages.inspections import show_new_inspection_form
+from pages.records import show_inspection_records
 
 
 st.set_page_config(
@@ -49,8 +49,7 @@ elif page == "New Inspection":
 
 elif page == "Inspection Records":
 
-    st.header("Inspection Records")
-    st.info("Inspection Records module will be developed in a later step.")
+    show_inspection_records()
 
 
 elif page == "Enforcement":
