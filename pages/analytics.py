@@ -10,152 +10,26 @@ import config
 from data_manager import load_inspections, normalize_plot_number
 
 
-def generate_benchmark_data():
-    """Simulates a realistic municipal housing development dataset (10 plots, multi-sector, mixed compliance)."""
-    records = [
-        {
-            "Inspection ID": "INS-BM-001", "Inspection Date": "2026-08-10", "Inspector": "Eng. Saad",
-            "Sector": "A", "Plot Number": "12-A", "Owner": "Kamran Khan", "Contractor": "Al-Buraq Builders",
-            "Inspection Type": "Routine Inspection", "Construction Activity": "Slab Casting", "Level / Floor": "First Floor",
-            "Progress %": 45.0, "Observation": "Inadequate bar spacing in negative moment zone.",
-            "Defects": "Spacing is 150mm instead of approved 100mm.", "Compliance Status": "Major Non-Compliance",
-            "Violation Type": "Structural / Safety", "Severity": "Critical",
-            "Recommended Action": "Halt concrete pour. Re-tie rebar according to structural drawing S-04.",
-            "Work Stopped": True, "Deadline": "2026-08-25", "Follow-up Required": True, "Follow-up Date": "2026-08-26",
-            "Front-view Site Image": "", "Defect Evidence Image": ""
-        },
-        {
-            "Inspection ID": "INS-BM-002", "Inspection Date": "2026-08-15", "Inspector": "Eng. Saad",
-            "Sector": "A", "Plot Number": "14-A", "Owner": "Zahid Afridi", "Contractor": "Habib & Sons",
-            "Inspection Type": "Routine Inspection", "Construction Activity": "Brickwork / Masonry", "Level / Floor": "Ground Floor",
-            "Progress %": 35.0, "Observation": "Mortar joints exceeding 12mm thickness.",
-            "Defects": "Inconsistent mortar lines and poor plumb.", "Compliance Status": "Minor Non-Compliance",
-            "Violation Type": "Workmanship Defect", "Severity": "Medium",
-            "Recommended Action": "Rake out thick joints and re-align boundary wall.",
-            "Work Stopped": False, "Deadline": "2026-09-01", "Follow-up Required": False, "Follow-up Date": "",
-            "Front-view Site Image": "", "Defect Evidence Image": ""
-        },
-        {
-            "Inspection ID": "INS-BM-003", "Inspection Date": "2026-08-20", "Inspector": "Eng. Ali",
-            "Sector": "B", "Plot Number": "22-B", "Owner": "Farhan Tariq", "Contractor": "Al-Buraq Builders",
-            "Inspection Type": "Routine Inspection", "Construction Activity": "Columns / Beams Casting", "Level / Floor": "Ground Floor",
-            "Progress %": 25.0, "Observation": "Honeycombing observed at beam-column joint after shuttering removal.",
-            "Defects": "Aggregate segregation and exposed steel ties.", "Compliance Status": "Major Non-Compliance",
-            "Violation Type": "Structural / Safety", "Severity": "High",
-            "Recommended Action": "Pressure grout with non-shrink structural mortar.",
-            "Work Stopped": True, "Deadline": "2026-08-30", "Follow-up Required": True, "Follow-up Date": "2026-09-01",
-            "Front-view Site Image": "", "Defect Evidence Image": ""
-        },
-        {
-            "Inspection ID": "INS-BM-004", "Inspection Date": "2026-09-12", "Inspector": "Eng. Saad",
-            "Sector": "B", "Plot Number": "35-B", "Owner": "Shaheer Afridi", "Contractor": "Prime Structures",
-            "Inspection Type": "Routine Inspection", "Construction Activity": "Excavation", "Level / Floor": "Foundation / Sub-structure",
-            "Progress %": 10.0, "Observation": "Excavation completed to approved depth of 5ft.",
-            "Defects": "", "Compliance Status": "Compliant", "Violation Type": "No Violation", "Severity": "",
-            "Recommended Action": "", "Work Stopped": False, "Deadline": "", "Follow-up Required": False, "Follow-up Date": "",
-            "Front-view Site Image": "", "Defect Evidence Image": ""
-        },
-        {
-            "Inspection ID": "INS-BM-005", "Inspection Date": "2026-09-01", "Inspector": "Eng. Saad",
-            "Sector": "B", "Plot Number": "40-B", "Owner": "Tariq Khan", "Contractor": "Al-Buraq Builders",
-            "Inspection Type": "Routine Inspection", "Construction Activity": "Foundation", "Level / Floor": "Foundation / Sub-structure",
-            "Progress %": 15.0, "Observation": "Lean concrete base poured satisfactorily.",
-            "Defects": "", "Compliance Status": "Compliant", "Violation Type": "No Violation", "Severity": "",
-            "Recommended Action": "", "Work Stopped": False, "Deadline": "", "Follow-up Required": False, "Follow-up Date": "",
-            "Front-view Site Image": "", "Defect Evidence Image": ""
-        },
-        {
-            "Inspection ID": "INS-BM-006", "Inspection Date": "2026-08-18", "Inspector": "Eng. Ali",
-            "Sector": "C", "Plot Number": "05-C", "Owner": "Bilal Jan", "Contractor": "Frontier Const.",
-            "Inspection Type": "Routine Inspection", "Construction Activity": "Plastering", "Level / Floor": "Ground Floor",
-            "Progress %": 60.0, "Observation": "Hairline shrinkage cracks on south-facing exterior wall.",
-            "Defects": "Insufficient wet curing during peak heat.", "Compliance Status": "Minor Non-Compliance",
-            "Violation Type": "Finishing Defect", "Severity": "Low",
-            "Recommended Action": "Extend water curing duration to 7 full days.",
-            "Work Stopped": False, "Deadline": "2026-09-05", "Follow-up Required": False, "Follow-up Date": "",
-            "Front-view Site Image": "", "Defect Evidence Image": ""
-        },
-        {
-            "Inspection ID": "INS-BM-007", "Inspection Date": "2026-08-28", "Inspector": "Eng. Saad",
-            "Sector": "C", "Plot Number": "18-C", "Owner": "Omar Farooq", "Contractor": "Habib & Sons",
-            "Inspection Type": "Routine Inspection", "Construction Activity": "MEP (Piping & Conduits)", "Level / Floor": "First Floor",
-            "Progress %": 70.0, "Observation": "Drainage pipe cut through structural beam web.",
-            "Defects": "Unapproved core drilling through structural element.", "Compliance Status": "Major Non-Compliance",
-            "Violation Type": "Approved Drawing Deviation", "Severity": "High",
-            "Recommended Action": "Submit structural engineer retrofit detail.",
-            "Work Stopped": False, "Deadline": "2026-09-10", "Follow-up Required": True, "Follow-up Date": "2026-09-11",
-            "Front-view Site Image": "", "Defect Evidence Image": ""
-        },
-        {
-            "Inspection ID": "INS-BM-008", "Inspection Date": "2026-09-05", "Inspector": "Eng. Ali",
-            "Sector": "D", "Plot Number": "09-D", "Owner": "Suleman Shah", "Contractor": "Prime Structures",
-            "Inspection Type": "Routine Inspection", "Construction Activity": "Flooring", "Level / Floor": "Ground Floor",
-            "Progress %": 85.0, "Observation": "Porcelain tile alignment within 1mm tolerance.",
-            "Defects": "", "Compliance Status": "Compliant", "Violation Type": "No Violation", "Severity": "",
-            "Recommended Action": "", "Work Stopped": False, "Deadline": "", "Follow-up Required": False, "Follow-up Date": "",
-            "Front-view Site Image": "", "Defect Evidence Image": ""
-        },
-        {
-            "Inspection ID": "INS-BM-009", "Inspection Date": "2026-08-12", "Inspector": "Eng. Saad",
-            "Sector": "D", "Plot Number": "11-D", "Owner": "Nasir Mehmood", "Contractor": "Frontier Const.",
-            "Inspection Type": "Routine Inspection", "Construction Activity": "Excavation", "Level / Floor": "Foundation / Sub-structure",
-            "Progress %": 8.0, "Observation": "Front boundary footing encroaches 0.45m into road right-of-way.",
-            "Defects": "Encroachment beyond demarcated plot line.", "Compliance Status": "Major Non-Compliance",
-            "Violation Type": "Encroachment / Boundary", "Severity": "Critical",
-            "Recommended Action": "Demolish footing in ROW immediately.",
-            "Work Stopped": True, "Deadline": "2026-08-20", "Follow-up Required": True, "Follow-up Date": "2026-08-21",
-            "Front-view Site Image": "", "Defect Evidence Image": ""
-        },
-        {
-            "Inspection ID": "INS-BM-010", "Inspection Date": "2026-09-08", "Inspector": "Eng. Ali",
-            "Sector": "E", "Plot Number": "50-E", "Owner": "Junaid Akbar", "Contractor": "Al-Buraq Builders",
-            "Inspection Type": "Routine Inspection", "Construction Activity": "Slab Casting", "Level / Floor": "Second Floor",
-            "Progress %": 65.0, "Observation": "Formwork props plumb and braced.",
-            "Defects": "", "Compliance Status": "Compliant", "Violation Type": "No Violation", "Severity": "",
-            "Recommended Action": "", "Work Stopped": False, "Deadline": "", "Follow-up Required": False, "Follow-up Date": "",
-            "Front-view Site Image": "", "Defect Evidence Image": ""
-        },
-    ]
-    return pd.DataFrame(records)
-
-
 def show_analytics_page():
     st.header("📈 Site Quality, Compliance & Risk Analytics")
     st.caption("Civil QA/QC performance metrics, Pareto defect distribution, vertical hazard profiling, and contractor scorecards.")
 
-    # ------------------------------------------------------------------
-    # Data Source Selection
-    # ------------------------------------------------------------------
-    live_df = load_inspections()
+    df_raw = load_inspections()
 
-    c_top1, c_top2 = st.columns([3, 1.3])
-    with c_top1:
-        st.markdown("##### 🎛️ Analytical Data Source")
-    with c_top2:
-        use_benchmark = st.toggle("📊 Load Society Benchmark (10 Plots)", value=False)
-
-    if use_benchmark or live_df.empty:
-        df_raw = generate_benchmark_data()
-        if live_df.empty and not use_benchmark:
-            st.info("💡 Live database is empty. Displaying **Society Benchmark Dataset** so all analytics populate.")
-        else:
-            st.success("🔎 Displaying **Society Benchmark Dataset** (10 multi-sector plots with verified non-compliances).")
-    else:
-        df_raw = live_df
-        st.info(f"📊 Analyzing **Live Inspection Database** ({len(live_df)} records on file).")
+    if df_raw.empty:
+        st.info("No inspection records available in the database. Log inspections to populate analytics.")
+        return
 
     # ------------------------------------------------------------------
-    # 1. Defensive Type Sanitization
+    # 1. Type Sanitization
     # ------------------------------------------------------------------
     df = df_raw.copy()
 
-    # Guarantee Inspection ID exists
     if "Inspection ID" not in df.columns:
         df["Inspection ID"] = [f"INS-{i+1:03d}" for i in range(len(df))]
     else:
         df["Inspection ID"] = df["Inspection ID"].fillna("").astype(str)
 
-    # Clean Progress %
     if "Progress %" in df.columns:
         df["Progress_Clean"] = (
             df["Progress %"]
@@ -170,12 +44,10 @@ def show_analytics_page():
     df["Parsed_Date"] = pd.to_datetime(df["Inspection Date"], errors="coerce")
     df["Parsed_Deadline"] = pd.to_datetime(df["Deadline"], errors="coerce")
 
-    # Strict boolean conversion
     df["Is_Stopped"] = df["Work Stopped"].apply(
         lambda x: True if str(x).strip().lower() in ["true", "yes", "1"] else False
     )
 
-    # String sanitization
     string_fields = [
         "Plot Number", "Sector", "Construction Activity", "Level / Floor",
         "Compliance Status", "Violation Type", "Severity", "Inspector", "Contractor", "Owner"
@@ -192,22 +64,23 @@ def show_analytics_page():
     # ------------------------------------------------------------------
     # 2. Scope Filter Bar
     # ------------------------------------------------------------------
-    sf1, sf2, sf3 = st.columns([1.5, 1.5, 2])
+    with st.expander("🎛️ Analytical Scope & Parameters", expanded=True):
+        sf1, sf2, sf3 = st.columns([1.5, 1.5, 2])
 
-    with sf1:
-        sec_list = ["All Sectors"] + sorted([s for s in df["Sector"].unique() if s != "Unassigned"])
-        selected_sector = st.selectbox("Filter Sector", sec_list)
+        with sf1:
+            sec_list = ["All Sectors"] + sorted([s for s in df["Sector"].unique() if s != "Unassigned"])
+            selected_sector = st.selectbox("Scope Sector", sec_list)
 
-    with sf2:
-        con_list = ["All Contractors"] + sorted([c for c in df["Contractor"].unique() if c != "Unassigned"])
-        selected_contractor = st.selectbox("Filter Contractor", con_list)
+        with sf2:
+            con_list = ["All Contractors"] + sorted([c for c in df["Contractor"].unique() if c != "Unassigned"])
+            selected_contractor = st.selectbox("Scope Contractor", con_list)
 
-    with sf3:
-        valid_dates = df["Parsed_Date"].dropna()
-        if not valid_dates.empty and valid_dates.min().date() != valid_dates.max().date():
-            date_window = st.date_input("Date Window", value=(valid_dates.min().date(), valid_dates.max().date()))
-        else:
-            date_window = None
+        with sf3:
+            valid_dates = df["Parsed_Date"].dropna()
+            if not valid_dates.empty and valid_dates.min().date() != valid_dates.max().date():
+                date_window = st.date_input("Date Window", value=(valid_dates.min().date(), valid_dates.max().date()))
+            else:
+                date_window = None
 
     filtered_df = df.copy()
     if selected_sector != "All Sectors":
@@ -224,7 +97,7 @@ def show_analytics_page():
     st.divider()
 
     # ------------------------------------------------------------------
-    # 3. Executive Civil QA/QC KPIs & Health Gauge
+    # 3. Executive KPIs & Gauge
     # ------------------------------------------------------------------
     total_inspections = len(filtered_df)
     unique_plots = filtered_df[filtered_df["Plot Number"] != "Unassigned"]["Plot Number"].nunique()
@@ -241,16 +114,16 @@ def show_analytics_page():
     overdue_count = len(overdue_notices)
 
     k1, k2, k3, k4, k5 = st.columns(5)
-    k1.metric("Inspections Monitored", total_inspections)
+    k1.metric("Inspections Audited", total_inspections)
     k2.metric("Active Sites", unique_plots)
-    k3.metric("First-Time Quality (FTQ)", f"{ftq_rate:.1f}%", help="Percentage of inspections passing without non-compliance")
+    k3.metric("First-Time Quality (FTQ)", f"{ftq_rate:.1f}%", help="Percentage of inspections meeting code compliance without non-conformance notices")
     k4.metric("Stop Work Orders", active_stops, delta=None if active_stops == 0 else f"{active_stops} Active", delta_color="inverse")
     k5.metric("Overdue Rectifications", overdue_count, delta=None if overdue_count == 0 else f"{overdue_count} Defaulted", delta_color="inverse")
 
     st.divider()
 
     # ------------------------------------------------------------------
-    # 4. Construction Stage-Gate Pipeline & Quality Gauge
+    # 4. Stage-Gate Lifecycle & Quality Gauge
     # ------------------------------------------------------------------
     g_col1, g_col2 = st.columns([1.2, 1.8])
 
@@ -259,7 +132,7 @@ def show_analytics_page():
             mode="gauge+number",
             value=ftq_rate,
             number={"suffix": "%", "font": {"size": 32}},
-            title={"text": "Site Quality Yield (FTQ)", "font": {"size": 16}},
+            title={"text": "First-Time Quality Yield", "font": {"size": 16}},
             gauge={
                 "axis": {"range": [0, 100], "tickwidth": 1},
                 "bar": {"color": "#0d6efd"},
@@ -319,6 +192,12 @@ def show_analytics_page():
         )
         st.plotly_chart(fig_stages, use_container_width=True)
 
+    with st.expander("💡 How to Read Quality Yield & Stage-Gate Lifecycle", expanded=False):
+        st.markdown("""
+        * **First-Time Quality (FTQ):** Measures the percentage of visits passing inspection on the first try. High scores ($\ge 85\%$) reflect strong builder compliance; scores below $70\%$ indicate frequent site defects.
+        * **Stage-Gate Distribution:** Shows how many society plots are currently progressing through foundational, structural framing, or architectural finishing stages.
+        """)
+
     st.divider()
 
     # ------------------------------------------------------------------
@@ -327,11 +206,12 @@ def show_analytics_page():
     st.subheader("1. Site Risk Priority Matrix (SRPI Watchlist)")
     st.caption("Empirical hazard index: (4 × Active Stop Work) + (3 × Critical Defect) + (2 × High Defect) + (1 × Minor Non-Compliance)")
 
-    with st.expander("💡 Understanding the Site Risk Priority Index (SRPI)", expanded=False):
+    with st.expander("💡 How to Interpret the Site Risk Priority Index (SRPI)", expanded=False):
         st.markdown("""
-        * **Formula:** $(4 \\times \\text{Stop Work}) + (3 \\times \\text{Critical Defect}) + (2 \\times \\text{High Defect}) + (1 \\times \\text{Minor Defect})$
-        * **Action Priority:** High-risk plots (Red $\\ge 6$, Amber $\\ge 3$) represent repeat non-compliances requiring active engineering supervision or legal enforcement.
-        * Detailed statutory rules and actions can be reviewed in the **Help & Guide** navigation page.
+        * **The SRPI Formula:** $(4 \\times \\text{Stop Work}) + (3 \\times \\text{Critical Defect}) + (2 \\times \\text{High Defect}) + (1 \\times \\text{Minor Defect})$
+        * **Red Zone ($\ge 6$):** Severe structural hazard or municipal setback encroachment. Site requires administrative stop-work enforcement.
+        * **Amber Zone ($3 - 5$):** Repeat non-compliance. Site requires mandatory re-inspection before concrete pours.
+        * **Clear Zone ($< 3$):** Normal routine monitoring.
         """)
 
     plot_groups = filtered_df[filtered_df["Plot Number"] != "Unassigned"].groupby("Plot Number")
@@ -390,19 +270,18 @@ def show_analytics_page():
     st.subheader("2. Pareto Analysis of Site Non-Conformances (CII 80/20 Principle)")
     st.caption("Identifies the vital 20% of structural activities causing 80% of project quality risks.")
 
-    with st.expander("💡 Understanding the Pareto (80/20) Chart & Construction Risk", expanded=False):
+    with st.expander("💡 How to Interpret the Pareto (80/20) Chart", expanded=False):
         st.markdown("""
-        * **The 80/20 Rule:** 80% of structural delays and safety hazards originate from roughly 20% of construction defect types.
-        * **Red Bars:** Total number of violations logged per activity category.
-        * **Blue Curve:** Cumulative percentage of overall site risk.
-        * **Focus Zone:** All trades situated to the left of the **80% Cutoff Line** represent your primary structural risks requiring mandatory pre-pour sign-offs.
-        * For comprehensive definitions, open the **Help & Guide** tab in the sidebar.
+        * **The 80/20 Rule:** 80% of structural delays and rework stem from roughly 20% of defect types.
+        * **Red Bars (Left Axis):** Absolute frequency of defects recorded for each violation category.
+        * **Blue Curve (Right Axis):** Cumulative percentage of total project quality hazard.
+        * **Action Focus:** Categories situated to the left of the **80% Cutoff Line** represent the critical trades site engineers must inspect before signing off concrete pours.
         """)
 
     defect_df = filtered_df[filtered_df["Compliance Status"] != "Compliant"].copy()
 
     if defect_df.empty:
-        st.success("✅ **Clean Site Certification:** Zero structural non-conformances or defects recorded under current filter.")
+        st.success("✅ **Clean Site Certification:** Zero structural non-conformances recorded under current filter.")
     else:
         p_col1, p_col2 = st.columns([1.6, 1.2])
 
@@ -464,7 +343,7 @@ def show_analytics_page():
                 color="Severity",
                 color_discrete_map=sev_palette,
                 hole=0.45,
-                title="Statutory Severity Distribution",
+                title="Statutory Severity Breakdown",
             )
             fig_sev.update_layout(margin=dict(l=10, r=10, t=40, b=10))
             st.plotly_chart(fig_sev, use_container_width=True)
@@ -472,7 +351,7 @@ def show_analytics_page():
     st.divider()
 
     # ------------------------------------------------------------------
-    # 7. Vertical Elevation Profile & Spatial Trade Matrix
+    # 7. Vertical Profile & Spatial Trade Matrix
     # ------------------------------------------------------------------
     v_col1, v_col2 = st.columns([1.1, 1.4])
 
@@ -513,7 +392,7 @@ def show_analytics_page():
             st.plotly_chart(fig_lvl, use_container_width=True)
 
     with v_col2:
-        st.subheader("4. Spatial Sector × Trade Infraction Heatmap")
+        st.subheader("4. Spatial Sector × Trade Matrix")
         st.caption("Cross-tabulation highlighting which trades cause compliance friction by sector.")
 
         if defect_df.empty:
@@ -530,17 +409,29 @@ def show_analytics_page():
             fig_heat.update_layout(margin=dict(l=10, r=10, t=20, b=10))
             st.plotly_chart(fig_heat, use_container_width=True)
 
+    with st.expander("💡 How to Read Vertical Elevation & Spatial Trade Matrix", expanded=False):
+        st.markdown("""
+        * **Vertical Elevation Profile:** Analyzes whether site defects concentrate during early foundation works or during upper-floor slab and frame casting.
+        * **Spatial Sector $\times$ Trade Heatmap:** Pinpoints localized contractor issues (e.g., rebar spacing errors concentrated specifically in Sector B).
+        """)
+
     st.divider()
 
     # ------------------------------------------------------------------
     # 8. Contractor Reliability & Rectification Aging
     # ------------------------------------------------------------------
-    c_col1, c_col2 = st.columns(2)
+    st.subheader("5. Contractor Reliability & Quality Performance")
+    st.caption("Comparative audit of execution quality, pass percentage, and Stop Work orders per builder.")
+
+    with st.expander("💡 How to Interpret Contractor Reliability & Rectification Aging", expanded=False):
+        st.markdown("""
+        * **Contractor Scorecard:** Highlights executing builders with low pass rates or recurring Stop Work orders. Top builders maintain $\ge 80\%$ pass yields.
+        * **Rectification Aging:** Categorizes unresolved violation notices into delinquency brackets. Notices exceeding $>30$ days represent statutory legal default.
+        """)
+
+    c_col1, c_col2 = st.columns([1.5, 1.2])
 
     with c_col1:
-        st.subheader("5. Contractor Reliability Scorecard")
-        st.caption("Execution quality, pass rate, and Stop Work orders per contractor.")
-
         contractors = [c for c in filtered_df["Contractor"].unique() if c != "Unassigned"]
         if contractors:
             c_metrics = []
@@ -560,15 +451,34 @@ def show_analytics_page():
                     "Total Defects": c_defs,
                 })
 
-            c_table = pd.DataFrame(c_metrics).sort_values(by=["Pass Rate (%)", "Stop Works"], ascending=[True, False])
-            st.dataframe(c_table, use_container_width=True, hide_index=True)
+            c_table = pd.DataFrame(c_metrics).sort_values(by="Pass Rate (%)", ascending=True)
+
+            # Interactive Plotly Chart for Contractor Reliability
+            fig_con = px.bar(
+                c_table,
+                x="Pass Rate (%)",
+                y="Contractor",
+                orientation="h",
+                color="Pass Rate (%)",
+                color_continuous_scale="Blues",
+                text="Pass Rate (%)",
+                title="Builder Quality Yield (First-Time Pass Rate %)",
+            )
+            fig_con.update_layout(
+                xaxis=dict(range=[0, 105]),
+                yaxis_title=None,
+                margin=dict(l=10, r=10, t=30, b=10),
+                bargap=0.3,
+            )
+            st.plotly_chart(fig_con, use_container_width=True)
+
+            # Compact Scorecard Table
+            st.dataframe(c_table.sort_values(by="Pass Rate (%)", ascending=False), use_container_width=True, hide_index=True)
         else:
             st.info("No contractors logged under active filter.")
 
     with c_col2:
-        st.subheader("6. Rectification Aging & Notice Defaults")
-        st.caption("Outstanding defect notices grouped by statutory deadline delinquency.")
-
+        st.markdown("##### Rectification Notice Aging Defaults")
         if defect_df.empty:
             st.info("No active defect rectifications pending.")
         else:
