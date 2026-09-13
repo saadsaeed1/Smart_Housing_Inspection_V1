@@ -40,8 +40,8 @@ page = st.sidebar.radio(
 # 4. Isolated Router (Dynamic Module Loading)
 # --------------------------------------------------------
 if page == "Dashboard":
-    st.header("📊 Society Overview & Executive Dashboard")
-    st.info("Executive KPI rollups and plot distribution maps will be finalized in the dashboard release.")
+    from pages.dashboard import show_dashboard_page
+    show_dashboard_page()
 
 elif page == "New Inspection":
     try:
@@ -64,8 +64,8 @@ elif page == "Analytics":
     show_analytics_page()
 
 elif page == "Reports & Export":
-    st.header("📄 Statutory Notices & Municipal Export")
-    st.info("Legal Stop Work notice printing and society audit exports will be wired in the reports release.")
+    from pages.reports import show_reports_page
+    show_reports_page()
 
 elif page == "Help & Guide":
     from pages.help_guide import show_help_page
@@ -77,4 +77,4 @@ elif page == "Help & Guide":
 st.sidebar.divider()
 st.sidebar.caption(f"Registered inspection records: **{len(inspection_df)}**")
 st.sidebar.caption("System Status: **All Validation Guards Active**")
-st.sidebar.caption("V1 — Production Build")
+st.sidebar.caption("V1 — Production Build Complete")

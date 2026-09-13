@@ -21,7 +21,7 @@ def show_analytics_page():
         return
 
     # ------------------------------------------------------------------
-    # 1. Type Sanitization
+    # 1. Defensive Normalization & Type Sanitization
     # ------------------------------------------------------------------
     df = df_raw.copy()
 
@@ -97,7 +97,7 @@ def show_analytics_page():
     st.divider()
 
     # ------------------------------------------------------------------
-    # 3. Executive KPIs & Gauge
+    # 3. Executive KPIs & Health Gauge
     # ------------------------------------------------------------------
     total_inspections = len(filtered_df)
     unique_plots = filtered_df[filtered_df["Plot Number"] != "Unassigned"]["Plot Number"].nunique()
@@ -193,7 +193,7 @@ def show_analytics_page():
         st.plotly_chart(fig_stages, use_container_width=True)
 
     with st.expander("💡 How to Read Quality Yield & Stage-Gate Lifecycle", expanded=False):
-        st.markdown("""
+        st.markdown(r"""
         * **First-Time Quality (FTQ):** Measures the percentage of visits passing inspection on the first try. High scores ($\ge 85\%$) reflect strong builder compliance; scores below $70\%$ indicate frequent site defects.
         * **Stage-Gate Distribution:** Shows how many society plots are currently progressing through foundational, structural framing, or architectural finishing stages.
         """)
@@ -207,8 +207,8 @@ def show_analytics_page():
     st.caption("Empirical hazard index: (4 × Active Stop Work) + (3 × Critical Defect) + (2 × High Defect) + (1 × Minor Non-Compliance)")
 
     with st.expander("💡 How to Interpret the Site Risk Priority Index (SRPI)", expanded=False):
-        st.markdown("""
-        * **The SRPI Formula:** $(4 \\times \\text{Stop Work}) + (3 \\times \\text{Critical Defect}) + (2 \\times \\text{High Defect}) + (1 \\times \\text{Minor Defect})$
+        st.markdown(r"""
+        * **The SRPI Formula:** $(4 \times \text{Stop Work}) + (3 \times \text{Critical Defect}) + (2 \times \text{High Defect}) + (1 \times \text{Minor Defect})$
         * **Red Zone ($\ge 6$):** Severe structural hazard or municipal setback encroachment. Site requires administrative stop-work enforcement.
         * **Amber Zone ($3 - 5$):** Repeat non-compliance. Site requires mandatory re-inspection before concrete pours.
         * **Clear Zone ($< 3$):** Normal routine monitoring.
@@ -271,7 +271,7 @@ def show_analytics_page():
     st.caption("Identifies the vital 20% of structural activities causing 80% of project quality risks.")
 
     with st.expander("💡 How to Interpret the Pareto (80/20) Chart", expanded=False):
-        st.markdown("""
+        st.markdown(r"""
         * **The 80/20 Rule:** 80% of structural delays and rework stem from roughly 20% of defect types.
         * **Red Bars (Left Axis):** Absolute frequency of defects recorded for each violation category.
         * **Blue Curve (Right Axis):** Cumulative percentage of total project quality hazard.
@@ -410,7 +410,7 @@ def show_analytics_page():
             st.plotly_chart(fig_heat, use_container_width=True)
 
     with st.expander("💡 How to Read Vertical Elevation & Spatial Trade Matrix", expanded=False):
-        st.markdown("""
+        st.markdown(r"""
         * **Vertical Elevation Profile:** Analyzes whether site defects concentrate during early foundation works or during upper-floor slab and frame casting.
         * **Spatial Sector $\times$ Trade Heatmap:** Pinpoints localized contractor issues (e.g., rebar spacing errors concentrated specifically in Sector B).
         """)
@@ -424,7 +424,7 @@ def show_analytics_page():
     st.caption("Comparative audit of execution quality, pass percentage, and Stop Work orders per builder.")
 
     with st.expander("💡 How to Interpret Contractor Reliability & Rectification Aging", expanded=False):
-        st.markdown("""
+        st.markdown(r"""
         * **Contractor Scorecard:** Highlights executing builders with low pass rates or recurring Stop Work orders. Top builders maintain $\ge 80\%$ pass yields.
         * **Rectification Aging:** Categorizes unresolved violation notices into delinquency brackets. Notices exceeding $>30$ days represent statutory legal default.
         """)
@@ -453,7 +453,6 @@ def show_analytics_page():
 
             c_table = pd.DataFrame(c_metrics).sort_values(by="Pass Rate (%)", ascending=True)
 
-            # Interactive Plotly Chart for Contractor Reliability
             fig_con = px.bar(
                 c_table,
                 x="Pass Rate (%)",
@@ -472,7 +471,6 @@ def show_analytics_page():
             )
             st.plotly_chart(fig_con, use_container_width=True)
 
-            # Compact Scorecard Table
             st.dataframe(c_table.sort_values(by="Pass Rate (%)", ascending=False), use_container_width=True, hide_index=True)
         else:
             st.info("No contractors logged under active filter.")
